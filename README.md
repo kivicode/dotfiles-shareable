@@ -9,7 +9,8 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin init --apply https://git
 ```
 
 This installs fish 4, Starship, fnm, zoxide, fzf/fd/bat and uv (Homebrew on macOS; apt/dnf/pacman plus
-upstream installers on Linux), writes the configs, and installs fish plugins with fisher.
+upstream installers on Linux), writes the configs, installs fish plugins with fisher, and automatically
+imports existing `~/.zsh_history` into fish history (if present).
 
 Then make fish the shell your terminal opens:
 
@@ -39,6 +40,7 @@ The prompt uses Nerd Font glyphs; install **MesloLGS NF** on machines you sit in
 | `dot_config/fish/fish_plugins` | fisher plugin list |
 | `dot_config/starship.toml` | Prompt, styled after the old Powerlevel10k "rainbow" config |
 | `run_onchange_*` | Package install and plugin sync scripts |
+| `run_once_after_30-import-zsh-history.sh` | One-time `~/.zsh_history` conversion and import into fish history |
 
 ## Secrets and per-machine settings
 

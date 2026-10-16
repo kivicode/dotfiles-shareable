@@ -59,3 +59,11 @@ command -v zoxide >/dev/null || curl -fsSL https://raw.githubusercontent.com/aje
 
 [ -x "$HOME/.local/bin/uv" ] || command -v uv >/dev/null ||
     curl -LsSf https://astral.sh/uv/install.sh | env UV_NO_MODIFY_PATH=1 sh
+
+export PATH="$HOME/.local/bin:$PATH"
+if command -v fnm >/dev/null 2>&1; then
+    if ! fnm ls 2>/dev/null | grep -q 'default'; then
+        echo "Installing Node.js LTS via fnm..."
+        fnm install --lts
+    fi
+fi

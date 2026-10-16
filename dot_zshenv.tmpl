@@ -1,0 +1,20 @@
+# fish is the interactive shell. This only gives non-interactive zsh (scripts, Claude Code, etc.)
+# the same core PATH. fnm's stable default alias is used because `fnm env` creates a temp dir per shell.
+export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 HOMEBREW_NO_AUTO_UPDATE=1
+
+for d in \
+{{- if eq .chezmoi.os "darwin" }}
+    /opt/homebrew/opt/python@3/libexec/bin \
+    /opt/homebrew/sbin \
+    /opt/homebrew/bin \
+{{- else }}
+    /home/linuxbrew/.linuxbrew/sbin \
+    /home/linuxbrew/.linuxbrew/bin \
+{{- end }}
+    "$HOME/.local/share/fnm/aliases/default/bin" \
+    "$HOME/.cargo/bin" \
+    "$HOME/.local/bin"
+do
+    [ -d "$d" ] && PATH="$d:$PATH"
+done
+export PATH

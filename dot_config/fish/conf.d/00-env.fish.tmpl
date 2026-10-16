@@ -1,0 +1,30 @@
+# conf.d runs before config.fish, so PATH and env must be settled here.
+
+{{ if eq .chezmoi.os "darwin" -}}
+test -x /opt/homebrew/bin/brew; and /opt/homebrew/bin/brew shellenv fish | source
+{{- else -}}
+test -x /home/linuxbrew/.linuxbrew/bin/brew; and /home/linuxbrew/.linuxbrew/bin/brew shellenv fish | source
+{{- end }}
+
+set -gx LANG en_US.UTF-8
+set -gx LC_ALL en_US.UTF-8
+set -gx HOMEBREW_NO_AUTO_UPDATE 1
+set -gx FZF_DEFAULT_COMMAND fd
+set -gx BUN_INSTALL $HOME/.bun
+set -gx PNPM_HOME {{ if eq .chezmoi.os "darwin" }}$HOME/Library/pnpm{{ else }}$HOME/.local/share/pnpm{{ end }}
+
+# -P edits $PATH directly instead of the universal fish_user_paths, keeping machines independent.
+# Missing dirs are skipped, so one list serves every machine.
+set -l prepend \
+    $HOME/.local/bin \
+    $HOME/.cargo/bin \
+    $BUN_INSTALL/bin \
+    $PNPM_HOME \
+    $HOME/.pixi/bin \
+    /opt/homebrew/opt/python@3/libexec/bin \
+    /usr/local/sbin
+for d in $prepend[-1..1]
+    test -d $d; and fish_add_path -P $d
+end
+
+command -q fnm; and fnm env --use-on-cd --version-file-strategy=recursive --shell fish | source

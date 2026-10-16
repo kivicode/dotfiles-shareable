@@ -1,0 +1,42 @@
+#!/bin/sh
+# Installs the shell toolchain. chezmoi re-runs this only when the file's content changes.
+set -eu
+mkdir -p "$HOME/.local/bin"
+
+{{ if eq .chezmoi.os "darwin" -}}
+command -v brew >/dev/null || { echo "Install Homebrew first: https://brew.sh" >&2; exit 1; }
+brew install fish starship fnm zoxide fzf fd bat
+[ -e "$HOME/.iterm2_shell_integration.fish" ] ||
+    curl -fsSL https://iterm2.com/shell_integration/fish -o "$HOME/.iterm2_shell_integration.fish"
+{{- else if eq .chezmoi.os "linux" }}
+SUDO=""
+[ "$(id -u)" -eq 0 ] || SUDO=sudo
+
+fish_major() { command -v fish >/dev/null && fish -c 'string split . $version' | head -1 || echo 0; }
+
+if command -v apt-get >/dev/null; then
+    # Distro fish is often 3.x; the PPA tracks 4.x on Ubuntu (Debian 13+ already ships 4.x).
+    if [ "$(fish_major)" -lt 4 ] && grep -qi '^ID=ubuntu' /etc/os-release; then
+        $SUDO apt-get install -y software-properties-common
+        $SUDO add-apt-repository -y ppa:fish-shell/release-4
+    fi
+    $SUDO apt-get update -qq
+    $SUDO apt-get install -y fish fzf fd-find bat curl unzip
+    # Debian/Ubuntu rename these binaries; fzf.fish expects the upstream names.
+    command -v fd >/dev/null || ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
+    command -v bat >/dev/null || ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
+elif command -v dnf >/dev/null; then
+    $SUDO dnf install -y fish fzf fd-find bat curl unzip
+elif command -v pacman >/dev/null; then
+    $SUDO pacman -S --needed --noconfirm fish fzf fd bat curl unzip
+else
+    echo "Unsupported package manager; install fish, fzf, fd, bat manually." >&2
+fi
+
+command -v starship >/dev/null || curl -fsSL https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin"
+command -v fnm >/dev/null || curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir "$HOME/.local/bin" --skip-shell
+command -v zoxide >/dev/null || curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh -s -- --bin-dir "$HOME/.local/bin"
+{{- end }}
+
+[ -x "$HOME/.local/bin/uv" ] || command -v uv >/dev/null ||
+    curl -LsSf https://astral.sh/uv/install.sh | env UV_NO_MODIFY_PATH=1 sh

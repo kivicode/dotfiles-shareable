@@ -1,0 +1,116 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Mirrors the old Powerlevel10k "rainbow" setup: powerline segments, MesloLGS NF icons.
+# Transitions use prev_bg so optional segments can appear/disappear without broken arrows.
+add_newline = true
+command_timeout = 1000
+
+format = """\
+[ ](fg:254 bg:blue)\
+$directory\
+$git_branch\
+$git_status\
+[](fg:prev_bg) \
+"""
+
+right_format = """\
+$status\
+$cmd_duration\
+$jobs\
+$direnv\
+$python\
+$nodejs\
+$username\
+$hostname\
+"""
+
+[directory]
+style = "fg:254 bg:blue"
+before_repo_root_style = "fg:254 bg:blue"
+repo_root_style = "bold fg:255 bg:blue"
+format = "[$path]($style)[$read_only]($read_only_style)[ ]($style)"
+repo_root_format = "[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style)[ ]($style)"
+read_only = " "
+read_only_style = "fg:254 bg:blue"
+truncation_length = 2
+truncate_to_repo = false
+fish_style_pwd_dir_length = 1
+truncation_symbol = ""
+home_symbol = "~"
+
+[git_branch]
+symbol = ""
+format = "[](fg:prev_bg bg:green)[ $symbol$branch ](fg:black bg:green)"
+only_attached = false
+
+[git_status]
+# Yellow pill only when there is something to report, like p10k's "modified" state.
+format = "([](fg:prev_bg bg:yellow)[ $ahead_behind$stashed$conflicted$staged$modified$renamed$deleted$untracked](fg:black bg:yellow))"
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇣${behind_count}⇡${ahead_count} "
+stashed = "*${count} "
+conflicted = "~${count} "
+staged = "+${count} "
+modified = "!${count} "
+renamed = "»${count} "
+deleted = "✘${count} "
+untracked = "?${count} "
+
+[status]
+disabled = false
+format = "[](fg:black)[ $symbol$common_meaning$signal_name$maybe_int ](fg:red bg:black)"
+success_symbol = "[✔](fg:green bg:black)"
+symbol = "[✘](fg:red bg:black) "
+not_executable_symbol = "[✘](fg:red bg:black) "
+not_found_symbol = "[✘](fg:red bg:black) "
+sigint_symbol = "[✘](fg:red bg:black) "
+signal_symbol = "[✘](fg:red bg:black) "
+map_symbol = true
+recognize_signal_code = true
+
+[cmd_duration]
+min_time = 3_000
+format = "[](fg:yellow bg:prev_bg)[ $duration ](fg:black bg:yellow)"
+
+[jobs]
+symbol = " "
+number_threshold = 1
+format = "[](fg:black bg:prev_bg)[ $symbol$number ](fg:cyan bg:black)"
+
+[direnv]
+disabled = false
+format = "[](fg:black bg:prev_bg)[ $symbol$loaded ](fg:yellow bg:black)"
+
+[python]
+# Only the venv name, like p10k's virtualenv segment (no interpreter version).
+format = "([](fg:blue bg:prev_bg)[ $symbol$virtualenv ](fg:black bg:blue))"
+symbol = " "
+detect_extensions = []
+detect_files = []
+detect_folders = []
+
+[nodejs]
+format = "[](fg:purple bg:prev_bg)[ $symbol$version ](fg:black bg:purple)"
+symbol = " "
+detect_extensions = []
+detect_files = [".nvmrc", ".node-version"]
+detect_folders = []
+
+[username]
+format = "[](fg:black bg:prev_bg)[ $user@](fg:yellow bg:black)"
+show_always = false
+
+[hostname]
+format = "[$hostname ](fg:yellow bg:black)"
+ssh_only = true
+ssh_symbol = ""
+
+[character]
+disabled = true
+
+[aws]
+disabled = true
+
+[gcloud]
+disabled = true

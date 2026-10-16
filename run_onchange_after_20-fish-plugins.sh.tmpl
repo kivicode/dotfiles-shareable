@@ -1,0 +1,16 @@
+#!/bin/sh
+# Re-runs whenever fish_plugins changes: {{ include "dot_config/fish/fish_plugins" | sha256sum }}
+set -eu
+command -v fish >/dev/null || exit 0
+
+fish -c '
+    type -q fisher; or curl -fsSL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source
+    fisher update
+'
+
+uv=$(command -v uv || echo "$HOME/.local/bin/uv")
+if [ -x "$uv" ]; then
+    mkdir -p "$HOME/.config/fish/completions"
+    "$uv" generate-shell-completion fish >"$HOME/.config/fish/completions/uv.fish"
+    "$(dirname "$uv")/uvx" --generate-shell-completion fish >"$HOME/.config/fish/completions/uvx.fish" 2>/dev/null || true
+fi

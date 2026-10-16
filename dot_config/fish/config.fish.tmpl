@@ -1,0 +1,17 @@
+if status is-interactive
+    set -g fish_greeting
+
+    abbr -a py python
+    abbr -a jj just
+
+    command -q starship; and starship init fish | source
+    command -q zoxide; and zoxide init fish | source
+    command -q direnv; and direnv hook fish | source
+{{- if eq .chezmoi.os "darwin" }}
+
+    test -e $HOME/.iterm2_shell_integration.fish; and source $HOME/.iterm2_shell_integration.fish
+{{- end }}
+end
+
+# Per-machine settings and secrets; never committed.
+test -f $__fish_config_dir/local.fish; and source $__fish_config_dir/local.fish

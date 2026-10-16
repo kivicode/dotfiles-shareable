@@ -4,7 +4,26 @@ set -eu
 mkdir -p "$HOME/.local/bin"
 
 {{ if eq .chezmoi.os "darwin" -}}
-command -v brew >/dev/null || { echo "Install Homebrew first: https://brew.sh" >&2; exit 1; }
+if ! command -v brew >/dev/null 2>&1; then
+    if [ -x "/opt/homebrew/bin/brew" ]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [ -x "/usr/local/bin/brew" ]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
+fi
+
+if ! command -v brew >/dev/null 2>&1; then
+    echo "Homebrew not found. Installing Homebrew (https://brew.sh)..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    if [ -x "/opt/homebrew/bin/brew" ]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [ -x "/usr/local/bin/brew" ]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
+fi
+
+command -v brew >/dev/null 2>&1 || { echo "Failed to find or install Homebrew. Please install Homebrew manually: https://brew.sh" >&2; exit 1; }
+
 brew install fish starship fnm zoxide fzf fd bat
 [ -e "$HOME/.iterm2_shell_integration.fish" ] ||
     curl -fsSL https://iterm2.com/shell_integration/fish -o "$HOME/.iterm2_shell_integration.fish"
